@@ -116,7 +116,7 @@
             class="border-y border-gray-200 bg-gray-100 dark:border-gray-700"
         >
             <TableHeadCell class="w-4 p-4"><Checkbox /></TableHeadCell>
-            {#each ["Name", "Init Data", "Balance", "Passes", "Status", "Actions"] as title}
+            {#each ["Name", "Status", "Balance", "Passes", "Actions"] as title}
                 <TableHeadCell class="p-4 font-medium">{title}</TableHeadCell>
             {/each}
         </TableHead>
@@ -124,33 +124,23 @@
             {#each $users as user}
                 <TableBodyRow class="text-base">
                     <TableBodyCell class="w-4 p-4"><Checkbox /></TableBodyCell>
-                    <TableBodyCell
-                        class="mr-12 flex items-center space-x-6 whitespace-nowrap p-4"
-                    >
-                        <div
-                            class="text-sm font-normal text-gray-500 dark:text-gray-400"
-                        >
-                            <div
-                                class="text-base font-semibold text-gray-900 dark:text-white"
-                            >
-                                {user.name}
-                            </div>
-                        </div>
+                    <TableBodyCell class="p-4">
+                        {user.name}
                     </TableBodyCell>
-                    <TableBodyCell
-                        class="max-w-sm overflow-hidden truncate p-4 text-base font-normal text-gray-500 dark:text-gray-400 xl:max-w-xs"
-                    >
-                        {user.initData}
-                    </TableBodyCell>
-                    <TableBodyCell class="p-4">{user.balance}</TableBodyCell>
-                    <TableBodyCell class="p-4">{user.passes}</TableBodyCell>
                     <TableBodyCell class="p-4 font-normal">
                         <div class="flex items-center gap-2">
                             <Indicator color={user.status ? "green" : "red"} />
                             {user.status ? "Active" : "Inactive"}
                         </div>
                     </TableBodyCell>
-                    <TableBodyCell class="space-x-2 p-4">
+                    <TableBodyCell class="p-4 text-right"
+                        >{user.balance || 0}</TableBodyCell
+                    >
+                    <TableBodyCell class="p-4 text-right"
+                        >{user.passes || 0}</TableBodyCell
+                    >
+
+                    <TableBodyCell class="w-2 space-x-2 p-4">
                         <Button
                             size="sm"
                             class="gap-2 px-3"

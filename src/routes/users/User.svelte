@@ -37,7 +37,7 @@
     <div class="space-y-6 p-0">
         <form on:submit={submit}>
             <div class="grid grid-cols-6 gap-6">
-                <Label class="col-span-6 space-y-2 sm:col-span-3">
+                <Label class="col-span-6 space-y-2 sm:col-span-6">
                     <span>Name</span>
                     <Input
                         name="name"
@@ -46,7 +46,8 @@
                         required
                     />
                 </Label>
-                <Label class="col-span-6 space-y-2 sm:col-span-3">
+
+                <Label class="col-span-6 space-y-2 sm:col-span-6">
                     <span>Init Data</span>
                     <Textarea
                         name="initData"
