@@ -39,14 +39,21 @@
     import MetaTag from "../utils/MetaTag.svelte";
     let openUser: boolean = false; // modal control
     let openDelete: boolean = false; // modal control
-    import { users } from "./store";
+    // import { users } from "./store";
     import type { TUser } from "../../types";
+    import { onMount } from "svelte";
+    import { initDB, db } from "../../db";
     let current_user: TUser;
     const path: string = "/users";
     const description: string =
         "CRUD users examaple - Flowbite Svelte Admin Dashboard";
     const title: string = "Flowbite Svelte Admin Dashboard - CRUD Users";
     const subtitle: string = "CRUD Users";
+
+    onMount(async () => {
+        await initDB();
+        let users = await db.select("users");
+    });
 </script>
 
 <MetaTag {path} {description} {title} {subtitle} />
