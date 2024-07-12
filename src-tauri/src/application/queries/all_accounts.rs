@@ -3,7 +3,7 @@ use crate::{
 };
 
 // might consider some sort,filter, pagination later
-pub async fn all_accounts_query() -> Result<Vec<Account>, surrealdb::Error> {
+pub async fn select_accounts_query() -> Result<Vec<Account>, surrealdb::Error> {
     let repository = AccountRepository::new();
     // let mut accounts = vec![];
     // if let Ok(result) = repository.get_all().await {
