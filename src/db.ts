@@ -1,16 +1,48 @@
-// src/db.ts
-import Surreal from 'surrealdb.js';
+import { Surreal, RecordId, Table } from "surrealdb.js";
+export async function testConnection() {
+  const db = new Surreal();
 
+  // Connect to the database
+  await db.connect("http://127.0.0.1:8000/rpc");
 
-export const db = new Surreal(import.meta.env.VITE_SURREALDB_URL);
+  // Select a specific namespace / database
+  await db.use({
+    namespace: "test",
+    database: "test",
+  });
 
-export const initDB = async () => {
-    await db.signin({
-        username: import.meta.env.VITE_SURREALDB_USER,
-        password: import.meta.env.VITE_SURREALDB_PASS,
-    });
+  // Signin as a namespace, database, or root user
+  await db.signin({
+    username: "root",
+    password: "root",
+  });
 
-    await db.use({namespace: 'bobr', database: 'bdash'});
-};
+  // Create a new person with a random id
+  let created = await db.create("person", {
+    title: "Founder & CEO",
+    name: {
+      first: "Tobie",
+      last: "Morgan Hitchcock",
+    },
+    marketing: true,
+  });
+  console.log({ created });
 
-export default db;
+  // Update a person record with a specific id
+  let updated = await db.merge(new RecordId("person", "jaime"), {
+    marketing: true,
+  });
+  console.log({ updated });
+
+  // Select all people records
+  let people = await db.select("person");
+  console.log({ people });
+  // Perform a custom advanced query
+  let groups = await db.query(
+    "SELECT marketing, count() FROM $tb GROUP BY marketing",
+    {
+      tb: new Table("person"),
+    },
+  );
+  console.log({ groups });
+}
