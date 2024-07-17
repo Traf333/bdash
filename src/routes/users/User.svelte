@@ -9,6 +9,8 @@
     } from "flowbite-svelte";
     import type { TUser } from "../../types";
     import { users } from "./store";
+    import { invoke } from "@tauri-apps/api/core";
+
     export let open: boolean = false; // modal control
 
     export let data: TUser = {
@@ -16,11 +18,13 @@
         initData: "",
         status: false,
     };
-    const submit = () => {
+    const submit = async () => {
         console.log(data);
         if (data.id) {
+            await invoke("updateAccount", data);
             users.updateUser(data);
         } else {
+            await invoke("createAccount", data);
             users.addUser(data);
         }
         open = false;

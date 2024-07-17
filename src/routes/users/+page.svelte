@@ -33,6 +33,7 @@
         PlusOutline,
         TrashBinSolid,
     } from "flowbite-svelte-icons";
+    import { invoke } from "@tauri-apps/api/core";
 
     import User from "./User.svelte";
     import Delete from "./Delete.svelte";
@@ -42,17 +43,15 @@
     // import { users } from "./store";
     import type { TUser } from "../../types";
     import { onMount } from "svelte";
-    import { initDB, db } from "../../db";
     let current_user: TUser;
     const path: string = "/users";
     const description: string =
         "CRUD users examaple - Flowbite Svelte Admin Dashboard";
     const title: string = "Flowbite Svelte Admin Dashboard - CRUD Users";
     const subtitle: string = "CRUD Users";
-
+    let users: TUser[] = [];
     onMount(async () => {
-        await initDB();
-        let users = await db.select("users");
+        users = await invoke("accounts");
     });
 </script>
 
@@ -128,7 +127,7 @@
             {/each}
         </TableHead>
         <TableBody>
-            {#each $users as user}
+            {#each users as user}
                 <TableBodyRow class="text-base">
                     <TableBodyCell class="w-4 p-4"><Checkbox /></TableBodyCell>
                     <TableBodyCell class="p-4">
