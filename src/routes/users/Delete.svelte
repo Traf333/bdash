@@ -1,14 +1,17 @@
 <script lang="ts">
     import { Button, Modal } from "flowbite-svelte";
     import { ExclamationCircleOutline } from "flowbite-svelte-icons";
+    import { invoke } from "@tauri-apps/api/core";
     export let open: boolean = false; // modal control
 
     import { users } from "./store";
 
-    export let userId: number;
+    export let id: string;
 
-    const deleteUser = () => {
-        users.removeUser(userId);
+    const deleteUser = async () => {
+        let res = await invoke("destroy_account", { id });
+        console.log("destroy", res);
+        users.removeUser(id);
         open = false;
     };
 </script>

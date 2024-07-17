@@ -6,7 +6,7 @@ use std::error::Error;
 
 use crate::domain::account::{Account, Data};
 
-fn head(access_token: Option<&String>) -> HeaderMap {
+fn head(access_token: &Option<String>) -> HeaderMap {
     let mut headers = HeaderMap::new();
     headers.insert("Accept", HeaderValue::from_static("application/json"));
     headers.insert(USER_AGENT, HeaderValue::from_static("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko)"));
@@ -32,7 +32,7 @@ pub async fn init(query: &serde_json::Value) -> Result<(String, String), Box<dyn
     let resp = client
         .post("https://gateway.blum.codes/v1/auth/provider/PROVIDER_TELEGRAM_MINI_APP")
         .json(&json!({ "query": query }))
-        .headers(head(None))
+        .headers(head(&None))
         .send()
         .await?;
     let resp_json: serde_json::Value = resp.json().await?;
@@ -48,7 +48,7 @@ pub async fn daily_claim(account: &Account) -> Result<(), Box<dyn Error>> {
 
     client
         .post("https://game-domain.blum.codes/api/v1/daily-reward?offset=-180")
-        .headers(head(Some(&account.access_token)))
+        .headers(head(&account.access_token))
         .send()
         .await?;
     Ok(())
@@ -59,12 +59,12 @@ pub async fn eight_hours_claim(account: &Account) -> Result<(), Box<dyn Error>> 
 
     client
         .post("https://game-domain.blum.codes/api/v1/farming/claim")
-        .headers(head(Some(&account.access_token)))
+        .headers(head(&account.access_token))
         .send()
         .await?;
     client
         .post("https://game-domain.blum.codes/api/v1/farming/start")
-        .headers(head(Some(&account.access_token)))
+        .headers(head(&account.access_token))
         .send()
         .await?;
     Ok(())
@@ -76,7 +76,7 @@ pub async fn balance(account: &mut Account) -> Result<(), Box<dyn Error>> {
     let uri = "https://game-domain.blum.codes/api/v1/user/balance";
     let resp = client
         .get(uri)
-        .headers(head(Some(&account.access_token)))
+        .headers(head(&account.access_token))
         .send()
         .await?;
     let resp_json: serde_json::Value = resp.json().await?;
@@ -101,7 +101,7 @@ pub async fn refresh_token(token: &String) -> Result<(String, String), Box<dyn E
     let resp = client
         .post("https://gateway.blum.codes/v1/auth/refresh")
         .json(&json!({ "refresh": token }))
-        .headers(head(None))
+        .headers(head(&None))
         .send()
         .await?;
     let resp_json: serde_json::Value = resp.json().await?;

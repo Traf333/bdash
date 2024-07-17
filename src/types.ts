@@ -1,7 +1,7 @@
 export type TUser = {
-  id?: any;
+  id?: { tb: "account"; id: { String: string } };
   name: string;
-  initData: string;
+  init_data: string;
   balance?: number;
   passes?: number;
   status: boolean;

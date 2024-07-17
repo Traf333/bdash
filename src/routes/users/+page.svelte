@@ -40,18 +40,17 @@
     import MetaTag from "../utils/MetaTag.svelte";
     let openUser: boolean = false; // modal control
     let openDelete: boolean = false; // modal control
-    // import { users } from "./store";
+    import { users, toUserId } from "./store";
     import type { TUser } from "../../types";
     import { onMount } from "svelte";
-    let current_user: TUser;
+    let current_user: TUser | undefined;
     const path: string = "/users";
     const description: string =
         "CRUD users examaple - Flowbite Svelte Admin Dashboard";
     const title: string = "Flowbite Svelte Admin Dashboard - CRUD Users";
     const subtitle: string = "CRUD Users";
-    let users: TUser[] = [];
     onMount(async () => {
-        users = await invoke("accounts");
+        users.set(await invoke("accounts"));
     });
 </script>
 
@@ -107,7 +106,9 @@
                 <Button
                     size="sm"
                     class="gap-2 whitespace-nowrap px-3"
-                    on:click={() => ((current_user = {}), (openUser = true))}
+                    on:click={() => (
+                        (current_user = undefined), (openUser = true)
+                    )}
                 >
                     <PlusOutline size="sm" />Add user
                 </Button>
@@ -127,7 +128,7 @@
             {/each}
         </TableHead>
         <TableBody>
-            {#each users as user}
+            {#each $users as user}
                 <TableBodyRow class="text-base">
                     <TableBodyCell class="w-4 p-4"><Checkbox /></TableBodyCell>
                     <TableBodyCell class="p-4">
@@ -176,4 +177,6 @@
 <!-- Modals -->
 
 <User bind:open={openUser} data={current_user} />
-<Delete bind:open={openDelete} userId={current_user?.id} />
+{#if current_user}
+    <Delete bind:open={openDelete} id={current_user?.id?.id?.String || ""} />
+{/if}

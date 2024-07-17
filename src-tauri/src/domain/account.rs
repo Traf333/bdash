@@ -13,9 +13,10 @@ pub struct Data {
 pub struct Account {
     pub id: Option<Thing>,
     pub name: String,
-    pub refresh_token: String,
-    pub access_token: String,
     pub init_data: String,
+    pub status: bool,
+    pub refresh_token: Option<String>,
+    pub access_token: Option<String>,
     pub data: Option<Data>,
 }
 
@@ -24,8 +25,9 @@ impl Account {
         Account {
             name: name.to_string(),
             init_data: init_data.to_string(),
-            refresh_token: refresh_token.to_string(),
-            access_token: access_token.to_string(),
+            refresh_token: Some(refresh_token.to_string()),
+            access_token: Some(access_token.to_string()),
+            status: false,
             data: None,
             id: None,
         }
@@ -34,16 +36,16 @@ impl Account {
     pub async fn refresh(&mut self) -> Result<(), Box<dyn std::error::Error>> {
         dbg!(&self.name);
         dbg!(&self.access_token);
-        if self.access_token.len() < 10 {
+        if let Some(token) = &self.refresh_token {
+            info!("Обновляем токен для: {}", self.name);
+            let (refresh_token, access_token) = client::refresh_token(token).await?;
+            self.refresh_token = Some(refresh_token);
+            self.access_token = Some(access_token);
+        } else {
             info!("Создаем новый токен для: {}", self.name);
             self.initialise().await?;
-        } else {
-            info!("Обновляем токен для: {}", self.name);
-            let (refresh_token, access_token) = client::refresh_token(&self.refresh_token).await?;
-            self.refresh_token = refresh_token;
-            self.access_token = access_token;
         }
-        info!("Новый токен: {}", self.access_token);
+        info!("Новый токен: {:?}", &self.access_token);
 
         Ok(())
     }
@@ -81,8 +83,8 @@ impl Account {
         if let Some(query) = data.get("tgWebAppData") {
             dbg!(query);
             let (refresh_token, access_token) = client::init(query).await?;
-            self.refresh_token = refresh_token;
-            self.access_token = access_token;
+            self.refresh_token = Some(refresh_token);
+            self.access_token = Some(access_token);
         } else {
             let message = format!("can not obtain data {}", self.init_data);
             panic!("{}", message);

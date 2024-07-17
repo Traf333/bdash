@@ -6,7 +6,7 @@ use crate::{
 
 pub async fn create(content: Account) -> Result<Vec<Account>, Error> {
     let repository = AccountRepository::new();
-
+    dbg!(&content);
     repository.create_account(content).await
 }
 

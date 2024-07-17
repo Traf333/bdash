@@ -7,7 +7,7 @@
         Modal,
         Textarea,
     } from "flowbite-svelte";
-    import type { TUser } from "../../types";
+    import type { TUser, TUserResponse } from "../../types";
     import { users } from "./store";
     import { invoke } from "@tauri-apps/api/core";
 
@@ -15,17 +15,25 @@
 
     export let data: TUser = {
         name: "",
-        initData: "",
+        init_data: "",
         status: false,
     };
     const submit = async () => {
         console.log(data);
         if (data.id) {
-            await invoke("updateAccount", data);
-            users.updateUser(data);
+            let response = await invoke<TUser>("update_account", {
+                id: data.id.id.String,
+                content: data,
+            });
+            console.log("after update response", response);
+            users.updateUser(response);
         } else {
-            await invoke("createAccount", data);
-            users.addUser(data);
+            let response = await invoke<TUser[]>("create_account", {
+                content: data,
+            });
+
+            console.log("after create response", response);
+            users.addUser(response[0]);
         }
         open = false;
     };
@@ -54,9 +62,9 @@
                 <Label class="col-span-6 space-y-2 sm:col-span-6">
                     <span>Init Data</span>
                     <Textarea
-                        name="initData"
+                        name="init_data"
                         placeholder="e.g. "
-                        bind:value={data.initData}
+                        bind:value={data.init_data}
                         required
                     />
                 </Label>
