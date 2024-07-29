@@ -10,21 +10,35 @@ pub struct Data {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
+pub enum AccountType {
+    Blum,
+    Doge,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
 pub struct Account {
     pub id: Option<Thing>,
     pub name: String,
     pub init_data: String,
     pub status: bool,
+    pub account_type: AccountType,
     pub refresh_token: Option<String>,
     pub access_token: Option<String>,
     pub data: Option<Data>,
 }
 
 impl Account {
-    pub fn new(name: &str, init_data: &str, refresh_token: &str, access_token: &str) -> Account {
+    pub fn new(
+        name: &str,
+        init_data: &str,
+        account_type: AccountType,
+        refresh_token: &str,
+        access_token: &str,
+    ) -> Account {
         Account {
             name: name.to_string(),
             init_data: init_data.to_string(),
+            account_type,
             refresh_token: Some(refresh_token.to_string()),
             access_token: Some(access_token.to_string()),
             status: false,

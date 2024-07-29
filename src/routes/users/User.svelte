@@ -7,7 +7,7 @@
         Modal,
         Textarea,
     } from "flowbite-svelte";
-    import type { TUser, TUserResponse } from "../../types";
+    import type { TUser } from "../../types";
     import { users } from "./store";
     import { invoke } from "@tauri-apps/api/core";
 
@@ -17,6 +17,7 @@
         name: "",
         init_data: "",
         status: false,
+        account_type: "Blum",
     };
     const submit = async () => {
         console.log(data);

@@ -37,9 +37,12 @@
 
     import User from "./User.svelte";
     import Delete from "./Delete.svelte";
+    import ConfirmExport from "./ConfirmExport.svelte";
     import MetaTag from "../utils/MetaTag.svelte";
     let openUser: boolean = false; // modal control
     let openDelete: boolean = false; // modal control
+    let search = "";
+    let exportFile: File | undefined;
     import { users, toUserId } from "./store";
     import type { TUser } from "../../types";
     import { onMount } from "svelte";
@@ -49,6 +52,24 @@
         "CRUD users examaple - Flowbite Svelte Admin Dashboard";
     const title: string = "Flowbite Svelte Admin Dashboard - CRUD Users";
     const subtitle: string = "CRUD Users";
+    let openExport = false;
+    function handleFileChange(event: Event) {
+        openExport = true;
+        console.log(typeof event);
+        const target = event.target as HTMLInputElement;
+        const file = target.files && target.files[0];
+        if (file) {
+            exportFile = file;
+            // Add your file handling logic here, such as uploading or reading the file.
+            console.log(`Selected file: ${file.name}`);
+        }
+    }
+    $: filteredUsers = search
+        ? $users.filter((u) =>
+              u.name.toLowerCase().includes(search.toLowerCase()),
+          )
+        : $users;
+
     onMount(async () => {
         users.set(await invoke("accounts"));
     });
@@ -69,11 +90,11 @@
         >
             All users
         </Heading>
-
         <Toolbar embedded class="w-full py-4 text-gray-500  dark:text-gray-400">
             <Input
                 placeholder="Search for users"
                 class="me-4 w-80 border xl:w-96"
+                bind:value={search}
             />
             <div class="border-l border-gray-100 pl-2 dark:border-gray-700">
                 <ToolbarButton
@@ -113,39 +134,40 @@
                     <PlusOutline size="sm" />Add user
                 </Button>
                 <Button size="sm" color="alternative" class="gap-2 px-3">
-                    <DownloadSolid size="md" class="-ml-1" />Export
+                    <DownloadSolid size="md" class="-ml-1" /><label for="export"
+                        >Export</label
+                    >
                 </Button>
+                <input
+                    type="file"
+                    name="export"
+                    id="export"
+                    class="hidden"
+                    on:change={handleFileChange}
+                />
             </div>
         </Toolbar>
     </div>
-    <Table>
+    <Table striped hoverable>
         <TableHead
             class="border-y border-gray-200 bg-gray-100 dark:border-gray-700"
         >
-            <TableHeadCell class="w-4 p-4"><Checkbox /></TableHeadCell>
-            {#each ["Name", "Status", "Balance", "Passes", "Actions"] as title}
+            {#each ["Name", "Type", "Actions"] as title}
                 <TableHeadCell class="p-4 font-medium">{title}</TableHeadCell>
             {/each}
         </TableHead>
         <TableBody>
-            {#each $users as user}
+            {#each filteredUsers as user}
                 <TableBodyRow class="text-base">
-                    <TableBodyCell class="w-4 p-4"><Checkbox /></TableBodyCell>
                     <TableBodyCell class="p-4">
-                        {user.name}
-                    </TableBodyCell>
-                    <TableBodyCell class="p-4 font-normal">
                         <div class="flex items-center gap-2">
                             <Indicator color={user.status ? "green" : "red"} />
-                            {user.status ? "Active" : "Inactive"}
+                            {user.name}
                         </div>
                     </TableBodyCell>
-                    <TableBodyCell class="p-4 text-right"
-                        >{user.balance || 0}</TableBodyCell
-                    >
-                    <TableBodyCell class="p-4 text-right"
-                        >{user.passes || 0}</TableBodyCell
-                    >
+                    <TableBodyCell class="p-4 font-normal">
+                        {user.account_type}
+                    </TableBodyCell>
 
                     <TableBodyCell class="w-2 space-x-2 p-4">
                         <Button
@@ -180,3 +202,4 @@
 {#if current_user}
     <Delete bind:open={openDelete} id={current_user?.id?.id?.String || ""} />
 {/if}
+<ConfirmExport bind:open={openExport} />
