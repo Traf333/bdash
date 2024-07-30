@@ -16,6 +16,15 @@ pub async fn update(id: String, content: Account) -> Result<Account, Error> {
     repository.update_account(id, content).await
 }
 
+pub async fn obtain_balance(id: String) -> Result<Account, Error> {
+    let repository = AccountRepository::new();
+
+    let mut account = repository.get_by_id(id.clone()).await?;
+    account.refresh().await.unwrap();
+    account.balance().await.unwrap();
+    repository.update_account(id, account).await
+}
+
 pub async fn destroy(id: String) -> Result<Account, Error> {
     let repository = AccountRepository::new();
 

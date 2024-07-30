@@ -31,13 +31,14 @@
         EditOutline,
         ExclamationCircleSolid,
         PlusOutline,
+        RefreshOutline,
         TrashBinSolid,
     } from "flowbite-svelte-icons";
     import { invoke } from "@tauri-apps/api/core";
 
     import User from "./User.svelte";
     import Delete from "./Delete.svelte";
-    import ConfirmExport from "./ConfirmExport.svelte";
+    // import ConfirmExport from "./ConfirmExport.svelte";
     import MetaTag from "../utils/MetaTag.svelte";
     let openUser: boolean = false; // modal control
     let openDelete: boolean = false; // modal control
@@ -63,6 +64,10 @@
             // Add your file handling logic here, such as uploading or reading the file.
             console.log(`Selected file: ${file.name}`);
         }
+    }
+
+    async function refresh(id: string) {
+        invoke("refresh_account", { id });
     }
     $: filteredUsers = search
         ? $users.filter((u) =>
@@ -180,6 +185,13 @@
                             <EditOutline size="sm" />
                         </Button>
                         <Button
+                            size="sm"
+                            class="gap-2 px-3"
+                            on:click={() => refresh(user.id)}
+                        >
+                            <RefreshOutline size="sm" />
+                        </Button>
+                        <Button
                             color="red"
                             size="sm"
                             class="gap-2 px-3"
@@ -202,4 +214,4 @@
 {#if current_user}
     <Delete bind:open={openDelete} id={current_user?.id?.id?.String || ""} />
 {/if}
-<ConfirmExport bind:open={openExport} />
+<!-- <ConfirmExport bind:open={openExport} /> -->

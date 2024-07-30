@@ -1,7 +1,9 @@
 pub mod application;
 pub mod domain;
 pub mod infrastructure;
-use application::routes::accounts::{accounts, create_account, destroy_account, update_account};
+use application::routes::accounts::{
+    accounts, create_account, destroy_account, refresh_account, update_account,
+};
 use infrastructure::db::connect_db;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -16,6 +18,7 @@ pub fn run() {
             accounts,
             create_account,
             update_account,
+            refresh_account,
             destroy_account
         ])
         .run(tauri::generate_context!())

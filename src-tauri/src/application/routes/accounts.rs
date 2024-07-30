@@ -17,6 +17,11 @@ pub async fn update_account(id: String, content: Account) -> surrealdb::Result<A
 }
 
 #[tauri::command(async)]
+pub async fn refresh_account(id: String) -> surrealdb::Result<Account> {
+    commands::account::obtain_balance(id).await
+}
+
+#[tauri::command(async)]
 pub async fn destroy_account(id: String) -> surrealdb::Result<Account> {
     commands::account::destroy(id).await
 }
