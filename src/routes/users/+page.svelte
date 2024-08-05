@@ -26,6 +26,7 @@
         CogSolid,
         DotsVerticalOutline,
         DownloadSolid,
+        FilterSolid,
     } from "flowbite-svelte-icons";
     import {
         EditOutline,
@@ -38,12 +39,12 @@
 
     import User from "./User.svelte";
     import Delete from "./Delete.svelte";
-    // import ConfirmExport from "./ConfirmExport.svelte";
     import MetaTag from "../utils/MetaTag.svelte";
     let openUser: boolean = false; // modal control
     let openDelete: boolean = false; // modal control
     let search = "";
-    let exportFile: File | undefined;
+    let sortColumn: "name" | "balance" | "passes" = "name";
+    let sortOrder: "asc" | "desc" = "desc";
     import { users, toUserId } from "./store";
     import type { TUser } from "../../types";
     import { onMount } from "svelte";
@@ -54,6 +55,7 @@
     const title: string = "Flowbite Svelte Admin Dashboard - CRUD Users";
     const subtitle: string = "CRUD Users";
     let openExport = false;
+    let exportFile;
     function handleFileChange(event: Event) {
         openExport = true;
         console.log(typeof event);
@@ -66,8 +68,18 @@
         }
     }
 
-    async function refresh(id: string) {
-        invoke("refresh_account", { id });
+    async function refresh(user: TUser) {
+        let response = await invoke<TUser>("refresh_account", {
+            id: toUserId(user.id),
+        });
+        console.log(response, "response");
+        users.updateUser(response);
+    }
+    function sortUsers(users: TUser[]): TUser[] {
+        return [...users].sort((a, b) => {
+            if (isNaN(Number(a.name)) || isNaN(Number(b.name))) return -1;
+            return Number(a.name) > Number(b.name) ? 1 : -1;
+        });
     }
     $: filteredUsers = search
         ? $users.filter((u) =>
@@ -105,8 +117,9 @@
                 <ToolbarButton
                     color="dark"
                     class="m-0 rounded p-1 hover:bg-gray-100 focus:ring-0 dark:hover:bg-gray-700"
+                    on:click={() => filteredUsers.map(refresh)}
                 >
-                    <CogSolid size="lg" />
+                    <RefreshOutline size="lg" />
                 </ToolbarButton>
                 <ToolbarButton
                     color="dark"
@@ -116,6 +129,12 @@
                 </ToolbarButton>
                 <ToolbarButton
                     color="dark"
+                    on:click={() =>
+                        alert(
+                            JSON.stringify(
+                                filteredUsers.map((f) => f.access_token),
+                            ),
+                        )}
                     class="m-0 rounded p-1 hover:bg-gray-100 focus:ring-0 dark:hover:bg-gray-700"
                 >
                     <ExclamationCircleSolid size="lg" />
@@ -157,12 +176,12 @@
         <TableHead
             class="border-y border-gray-200 bg-gray-100 dark:border-gray-700"
         >
-            {#each ["Name", "Type", "Actions"] as title}
+            {#each ["Name", "Balance", "Passes", "Actions"] as title}
                 <TableHeadCell class="p-4 font-medium">{title}</TableHeadCell>
             {/each}
         </TableHead>
         <TableBody>
-            {#each filteredUsers as user}
+            {#each sortUsers(filteredUsers) as user}
                 <TableBodyRow class="text-base">
                     <TableBodyCell class="p-4">
                         <div class="flex items-center gap-2">
@@ -171,7 +190,10 @@
                         </div>
                     </TableBodyCell>
                     <TableBodyCell class="p-4 font-normal">
-                        {user.account_type}
+                        {user.data?.total_balance}
+                    </TableBodyCell>
+                    <TableBodyCell class="p-4 font-normal">
+                        {user.data?.play_passes}
                     </TableBodyCell>
 
                     <TableBodyCell class="w-2 space-x-2 p-4">
@@ -187,7 +209,7 @@
                         <Button
                             size="sm"
                             class="gap-2 px-3"
-                            on:click={() => refresh(user.id)}
+                            on:click={() => refresh(user)}
                         >
                             <RefreshOutline size="sm" />
                         </Button>

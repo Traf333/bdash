@@ -26,7 +26,7 @@ fn head(access_token: &Option<String>) -> HeaderMap {
     headers
 }
 
-pub async fn init(query: &serde_json::Value) -> Result<(String, String), Box<dyn Error>> {
+pub async fn init(query: String) -> Result<(String, String), Box<dyn Error>> {
     let client = Client::new();
     dbg!(&json!({ "query": query }));
     let resp = client
@@ -108,9 +108,13 @@ pub async fn refresh_token(token: &String) -> Result<(String, String), Box<dyn E
     let access_token = &resp_json["access"];
     let refresh_token = &resp_json["refresh"];
 
-    dbg!(access_token);
-    Ok((
-        refresh_token.as_str().unwrap().to_string(),
-        access_token.as_str().unwrap().to_string(),
-    ))
+    if refresh_token.is_null() {
+        Ok((String::default(), String::default()))
+    } else {
+        dbg!(access_token);
+        Ok((
+            refresh_token.as_str().unwrap().to_string(),
+            access_token.as_str().unwrap().to_string(),
+        ))
+    }
 }

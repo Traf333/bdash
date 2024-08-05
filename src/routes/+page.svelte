@@ -1,12 +1,17 @@
 <script>
     import { onMount } from "svelte";
-    import { testConnection } from "../db";
     // Example data
     import { invoke } from "@tauri-apps/api/core";
-    let totalBalance = 1322231;
-    let totalAvailablePasses = 2003;
-    let numberOfUsers = 12345;
-    let data = ["nothing"];
+    import { users } from "./users/store";
+    let totalBalance = $users.reduce(
+        (acc, u) => acc + (u.data?.total_balance || 0),
+        0,
+    );
+    let totalAvailablePasses = $users.reduce(
+        (acc, u) => acc + (u.data?.play_passes || 0),
+        0,
+    );
+    let numberOfUsers = $users.length;
     onMount(() => {
         invoke("accounts").then((d) => (data = d));
     });

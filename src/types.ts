@@ -3,7 +3,11 @@ export type TUser = {
   name: string;
   account_type: "Blum" | "Dogs";
   init_data: string;
-  balance?: number;
-  passes?: number;
+  access_token: string;
+  refresh_token: string;
+  data?: {
+    total_balance?: number;
+    play_passes?: number;
+  };
   status: boolean;
 };

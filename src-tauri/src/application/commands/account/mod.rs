@@ -21,7 +21,9 @@ pub async fn obtain_balance(id: String) -> Result<Account, Error> {
 
     let mut account = repository.get_by_id(id.clone()).await?;
     account.refresh().await.unwrap();
+    dbg!(&account);
     account.balance().await.unwrap();
+    dbg!(&account, "refresh");
     repository.update_account(id, account).await
 }
 
