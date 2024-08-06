@@ -3,17 +3,16 @@
     // Example data
     import { invoke } from "@tauri-apps/api/core";
     import { users } from "./users/store";
-    let totalBalance = $users.reduce(
-        (acc, u) => acc + (u.data?.total_balance || 0),
-        0,
+    $: totalBalance = Math.round(
+        $users.reduce((acc, u) => acc + (u.data?.total_balance || 0), 0),
     );
-    let totalAvailablePasses = $users.reduce(
+    $: totalAvailablePasses = $users.reduce(
         (acc, u) => acc + (u.data?.play_passes || 0),
         0,
     );
-    let numberOfUsers = $users.length;
+    $: numberOfUsers = $users.length;
     onMount(() => {
-        invoke("accounts").then((d) => (data = d));
+        invoke("accounts").then((d) => users.set(d));
     });
 </script>
 

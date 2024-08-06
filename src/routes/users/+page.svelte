@@ -48,6 +48,7 @@
     import { users, toUserId } from "./store";
     import type { TUser } from "../../types";
     import { onMount } from "svelte";
+    import CopyToken from "./CopyToken.svelte";
     let current_user: TUser | undefined;
     const path: string = "/users";
     const description: string =
@@ -197,6 +198,8 @@
                     </TableBodyCell>
 
                     <TableBodyCell class="w-2 space-x-2 p-4">
+                        <CopyToken accessToken={user.access_token} />
+
                         <Button
                             size="sm"
                             class="gap-2 px-3"
