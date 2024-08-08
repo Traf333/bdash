@@ -31,7 +31,7 @@ pub struct Account {
     #[serde(deserialize_with = "deserialize_name")]
     pub name: String,
     pub init_data: InitData,
-    // pub status: Option<bool>,
+    pub status: Option<bool>,
     pub refresh_token: Option<String>,
     pub access_token: Option<String>,
     pub data: Option<Data>,

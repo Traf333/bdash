@@ -10,4 +10,5 @@ export type TUser = {
     play_passes?: number;
   };
   status: boolean;
+  selected?: boolean;
 };

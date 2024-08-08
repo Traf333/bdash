@@ -7,6 +7,8 @@
         Checkbox,
         Heading,
         Indicator,
+        Label,
+        Select,
     } from "flowbite-svelte";
     import {
         Input,
@@ -26,6 +28,7 @@
         CogSolid,
         DotsVerticalOutline,
         DownloadSolid,
+        FileCopyOutline,
         FilterSolid,
     } from "flowbite-svelte-icons";
     import {
@@ -43,12 +46,14 @@
     let openUser: boolean = false; // modal control
     let openDelete: boolean = false; // modal control
     let search = "";
+    let selectedStatus: boolean | string = "all";
     let sortColumn: "name" | "balance" | "passes" = "name";
     let sortOrder: "asc" | "desc" = "desc";
     import { users, toUserId } from "./store";
     import type { TUser } from "../../types";
     import { onMount } from "svelte";
     import CopyToken from "./CopyToken.svelte";
+    import { copyToClipboard } from "../utils/copy";
     let current_user: TUser | undefined;
     const path: string = "/users";
     const description: string =
@@ -82,11 +87,25 @@
             return Number(a.name) > Number(b.name) ? 1 : -1;
         });
     }
-    $: filteredUsers = search
-        ? $users.filter((u) =>
-              u.name.toLowerCase().includes(search.toLowerCase()),
-          )
-        : $users;
+
+    $: filteredUsers = $users.filter((u) => {
+        const matchesSearch = search
+            ? u.name.toLowerCase().includes(search.toLowerCase())
+            : true;
+        const matchesStatus =
+            typeof selectedStatus === "boolean"
+                ? u.status === selectedStatus
+                : true;
+        return matchesSearch && matchesStatus;
+    });
+    let selectAll = false;
+    function toggleSelectAll() {
+        // selectAll = !selectAll;
+        filteredUsers.forEach((user) => {
+            user.selected = selectAll;
+        });
+        users.set($users); // Update the users store
+    }
 
     onMount(async () => {
         users.set(await invoke("accounts"));
@@ -114,6 +133,17 @@
                 class="me-4 w-80 border xl:w-96"
                 bind:value={search}
             />
+            <Label>
+                <Select
+                    class="mr-2"
+                    items={[
+                        { value: "all", name: "Все" },
+                        { value: true, name: "Активные" },
+                        { value: false, name: "Забанненые" },
+                    ]}
+                    bind:value={selectedStatus}
+                />
+            </Label>
             <div class="border-l border-gray-100 pl-2 dark:border-gray-700">
                 <ToolbarButton
                     color="dark"
@@ -125,10 +155,16 @@
                 <ToolbarButton
                     color="dark"
                     class="m-0 rounded p-1 hover:bg-gray-100 focus:ring-0 dark:hover:bg-gray-700"
+                    on:click={() =>
+                        copyToClipboard(
+                            filteredUsers
+                                .filter((u) => u.selected)
+                                .map((u) => u.access_token),
+                        )}
                 >
-                    <TrashBinSolid size="lg" />
+                    <FileCopyOutline size="lg" />
                 </ToolbarButton>
-                <ToolbarButton
+                <!-- <ToolbarButton
                     color="dark"
                     on:click={() =>
                         alert(
@@ -139,13 +175,13 @@
                     class="m-0 rounded p-1 hover:bg-gray-100 focus:ring-0 dark:hover:bg-gray-700"
                 >
                     <ExclamationCircleSolid size="lg" />
-                </ToolbarButton>
-                <ToolbarButton
+                </ToolbarButton> -->
+                <!-- <ToolbarButton
                     color="dark"
                     class="m-0 rounded p-1 hover:bg-gray-100 focus:ring-0 dark:hover:bg-gray-700"
                 >
                     <DotsVerticalOutline size="lg" />
-                </ToolbarButton>
+                </ToolbarButton> -->
             </div>
 
             <div slot="end" class="flex items-center space-x-2">
@@ -158,18 +194,18 @@
                 >
                     <PlusOutline size="sm" />Add user
                 </Button>
-                <Button size="sm" color="alternative" class="gap-2 px-3">
+                <!-- <Button size="sm" color="alternative" class="gap-2 px-3">
                     <DownloadSolid size="md" class="-ml-1" /><label for="export"
                         >Export</label
                     >
-                </Button>
-                <input
+                </Button> -->
+                <!-- <input
                     type="file"
                     name="export"
                     id="export"
                     class="hidden"
                     on:change={handleFileChange}
-                />
+                /> -->
             </div>
         </Toolbar>
     </div>
@@ -177,6 +213,12 @@
         <TableHead
             class="border-y border-gray-200 bg-gray-100 dark:border-gray-700"
         >
+            <TableHeadCell class="w-4 p-4"
+                ><Checkbox
+                    on:change={toggleSelectAll}
+                    bind:checked={selectAll}
+                /></TableHeadCell
+            >
             {#each ["Name", "Balance", "Passes", "Actions"] as title}
                 <TableHeadCell class="p-4 font-medium">{title}</TableHeadCell>
             {/each}
@@ -184,6 +226,11 @@
         <TableBody>
             {#each sortUsers(filteredUsers) as user}
                 <TableBodyRow class="text-base">
+                    <TableBodyCell class="w-4 p-4"
+                        ><Checkbox
+                            bind:checked={user.selected}
+                        /></TableBodyCell
+                    >
                     <TableBodyCell class="p-4">
                         <div class="flex items-center gap-2">
                             <Indicator color={user.status ? "green" : "red"} />

@@ -21,6 +21,7 @@
     };
     const submit = async () => {
         console.log(data);
+
         if (data.id) {
             let response = await invoke<TUser>("update_account", {
                 id: data.id.id.String,
@@ -30,7 +31,7 @@
             users.updateUser(response);
         } else {
             let response = await invoke<TUser[]>("create_account", {
-                content: data,
+                content: { ...data, init_data: JSON.parse(data.init_data) },
             });
 
             console.log("after create response", response);
@@ -60,18 +61,20 @@
                     />
                 </Label>
 
-                <Label class="col-span-6 space-y-2 sm:col-span-6">
-                    <span>Init Data</span>
-                    <Textarea
-                        name="init_data"
-                        placeholder="e.g. "
-                        bind:value={data.init_data}
-                        required
-                    />
-                </Label>
+                {#if !data.id}
+                    <Label class="col-span-6 space-y-2 sm:col-span-6">
+                        <span>Init Data</span>
+                        <Textarea
+                            name="init_data"
+                            placeholder="e.g. "
+                            bind:value={data.init_data}
+                            required
+                        />
+                    </Label>
+                {/if}
                 <Label class="col-span-6 space-y-2 sm:col-span-3">
                     <Checkbox name="status" bind:checked={data.status}>
-                        Status
+                        Активный
                     </Checkbox>
                 </Label>
             </div>
