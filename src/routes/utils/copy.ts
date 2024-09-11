@@ -69,7 +69,7 @@ async function playAndClaimCycle(token) {
      console.error(\`Cycle \${i + 1} - Error:\`, error);
      return;
    }
-   await new Promise((resolve) => setTimeout(resolve, 5000));
+   await new Promise((resolve) => setTimeout(resolve, 12000));
  }
 
  console.log(\`TOTAL: \${totalPoints}\`);
@@ -83,7 +83,7 @@ function delay(ms) {
 async function processAccounts(tokens) {
  for (let index = 0; index < tokens.length; index++) {
    const token = tokens[index];
-   await delay(Math.random() * 1000 + 2000); // delay for 2-3 seconds
+   await delay(Math.random() * 4000 + 10000); // delay for 2-3 seconds
    playAndClaimCycle(token);
  }
 }`;
