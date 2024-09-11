@@ -30,7 +30,7 @@ pub async fn init(query: String) -> Result<(String, String), Box<dyn Error>> {
     let client = Client::new();
     dbg!(&json!({ "query": query }));
     let resp = client
-        .post("https://gateway.blum.codes/v1/auth/provider/PROVIDER_TELEGRAM_MINI_APP")
+        .post("https://user-domain.blum.codes/api/v1/auth/provider/PROVIDER_TELEGRAM_MINI_APP")
         .json(&json!({ "query": query }))
         .headers(head(&None))
         .send()
@@ -99,7 +99,7 @@ pub async fn refresh_token(token: &String) -> Result<(String, String), Box<dyn E
     let client = Client::new();
 
     let resp = client
-        .post("https://gateway.blum.codes/v1/auth/refresh")
+        .post("https://user-domain.blum.codes/api/v1/auth/refresh")
         .json(&json!({ "refresh": token }))
         .headers(head(&None))
         .send()
