@@ -1,6 +1,6 @@
 {
   "productName": "bdash",
-  "version": "0.0.1",
+  "version": "0.1.1",
   "identifier": "com.bdash.dev",
   "build": {
     "beforeDevCommand": "yarn dev",
