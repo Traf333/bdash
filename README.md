@@ -14,12 +14,12 @@ A desktop application built with [Tauri](https://tauri.app/), [SvelteKit](https:
 
 ```
 bdash/
-├── src/               # SvelteKit frontend code
-├── src-tauri/        # Rust backend code
+├── src/                 # SvelteKit frontend code
+├── src-tauri/           # Rust backend code
 │   ├── src/
-│   │   ├── domain/   # Domain models
+│   │   ├── domain/      # Domain models
 │   │   └── application/ # Application logic and commands
-└── static/           # Static assets
+└── static/              # Static assets
 ```
 
 ## Development
