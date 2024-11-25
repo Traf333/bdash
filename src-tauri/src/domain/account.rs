@@ -96,17 +96,11 @@ impl Account {
     // }
 
     pub async fn refresh(&mut self) -> Result<(), Box<dyn std::error::Error>> {
-        dbg!(&self.name);
-        dbg!(&self.access_token);
-        dbg!(&self.refresh_token);
         if let Some(token) = &self.refresh_token {
             info!("Обновляем токен для: {}", self.name);
-            dbg!("refreshing");
 
             let (refresh_token, access_token) = client::refresh_token(token).await?;
             if access_token.is_empty() {
-                dbg!("initializing");
-
                 self.initialise().await?;
             } else {
                 self.refresh_token = Some(refresh_token);
@@ -114,7 +108,6 @@ impl Account {
             }
         } else {
             info!("Создаем новый токен для: {}", self.name);
-            dbg!("initializing newlyu");
 
             self.initialise().await?;
         }
@@ -138,8 +131,7 @@ impl Account {
     }
 
     pub async fn daily(&self) -> Result<(), Box<dyn std::error::Error>> {
-        info!("Вход каждый день: {}", self.name);
-
+        info!("Вход каждый день: {}", &self.name);
         client::daily_claim(self).await?;
         Ok(())
     }

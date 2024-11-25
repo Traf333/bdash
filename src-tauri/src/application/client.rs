@@ -28,7 +28,6 @@ fn head(access_token: &Option<String>) -> HeaderMap {
 
 pub async fn init(query: String) -> Result<(String, String), Box<dyn Error>> {
     let client = Client::new();
-    dbg!(&json!({ "query": query }));
     let resp = client
         .post("https://user-domain.blum.codes/api/v1/auth/provider/PROVIDER_TELEGRAM_MINI_APP")
         .json(&json!({ "query": query }))
@@ -36,7 +35,6 @@ pub async fn init(query: String) -> Result<(String, String), Box<dyn Error>> {
         .send()
         .await?;
     let resp_json: serde_json::Value = resp.json().await?;
-    dbg!(&resp_json);
     let token_data = &resp_json["token"];
     Ok((
         token_data["refresh"].as_str().unwrap().to_string(),
@@ -111,7 +109,6 @@ pub async fn refresh_token(token: &String) -> Result<(String, String), Box<dyn E
     if refresh_token.is_null() {
         Ok((String::default(), String::default()))
     } else {
-        dbg!(access_token);
         Ok((
             refresh_token.as_str().unwrap().to_string(),
             access_token.as_str().unwrap().to_string(),

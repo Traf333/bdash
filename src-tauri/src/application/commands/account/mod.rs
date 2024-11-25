@@ -6,7 +6,6 @@ use crate::{
 
 pub async fn create(content: Account) -> Result<Vec<Account>, Error> {
     let repository = AccountRepository::new();
-    dbg!(&content);
     repository.create_account(content).await
 }
 
@@ -21,9 +20,9 @@ pub async fn obtain_balance(id: String) -> Result<Account, Error> {
 
     let mut account = repository.get_by_id(id.clone()).await?;
     account.refresh().await.unwrap();
-    dbg!(&account);
+    account.daily().await.unwrap();
     account.balance().await.unwrap();
-    dbg!(&account, "refresh");
+
     repository.update_account(id, account).await
 }
 
